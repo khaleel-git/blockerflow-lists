@@ -6,9 +6,9 @@ AdGuard Home, uBlock Origin or a hosts file, or in your own tooling.
 
 There are two lists:
 
-- `pornography/`: about 894,000 adult-site domains, plus the keyword files BlockerFlow's Android app
+- `pornography/`: about 0.9 million adult-site domains (the exact count is the number of lines after the header in `domains.txt`), plus the keyword files BlockerFlow's Android app
   uses to catch adult sites that are not on the domain list.
-- `web-proxy/`: about 19,000 web-proxy and filter-avoidance domains (sites used to get around a
+- `web-proxy/`: about 19 thousand web-proxy and filter-avoidance domains (sites used to get around a
   blocker).
 
 The files are rebuilt from the signed pack that the app downloads, so what is here is what BlockerFlow
@@ -23,7 +23,7 @@ Paths are relative to the repository root. `<list>` is `pornography` or `web-pro
 | `<list>/domains.txt` | One domain per line, sorted. Lines starting with `#` are comments (the header). | Pi-hole and other tools that take a plain domain list. |
 | `<list>/hosts.txt` | `0.0.0.0 <domain>` per line, sorted. | A hosts file, Pi-hole, any tool that reads hosts format. |
 | `<list>/adblock.txt` | Adblock Plus syntax: `\|\|<domain>^` per line. | AdGuard Home, uBlock Origin. |
-| `<list>/domains-with-sources.txt` | `domain\|source_mask` per line, sorted. The `web-proxy` copy starts with four `#` comment lines. This is the exact file the app and the signed manifest use. | Checking the signature, or seeing which source listed a domain. |
+| `<list>/domains-with-sources.txt` | `domain\|source_mask` per line, sorted. This is the exact file the app and the signed manifest use, so it is not edited: the `web-proxy` copy starts with four `#` comment lines, BlockerFlow's internal build header. Its "Edit curated.txt" line refers to BlockerFlow's private sources, not to files in this repository. | Checking the signature, or seeing which source listed a domain. |
 | `pornography/keywords.txt` | `keyword\|weight\|requiresBoundary` per line. `weight` is a number; `weight >= 100` means high confidence. `requiresBoundary` is `true` or `false` (match whole words only). | Scoring URLs and search terms. |
 | `pornography/keywords_intl.txt` | `term\|kind\|lang` per line, `#` comments. `kind` is `strong`, `adult`, `context`, `help` or `cancel`; the header in the file explains each. | Adult keywords in other languages. |
 | `pornography/keyword_tiers.txt` | `keyword\|strong` or `keyword\|context`. `strong` blocks on its own; `context` only counts next to another adult term. A keyword not listed is `adult` (two needed). | Tiers for `keywords.txt`. |
@@ -32,10 +32,21 @@ Paths are relative to the repository root. `<list>` is `pornography` or `web-pro
 | `manifest.json` | JSON with two fields: `payload` (a string holding the pack version, build time and a path, size and sha256 for each source file) and `signature` (base64, ECDSA P-256 over the `payload` string). | Verifying the lists. See below. |
 | `blockerflow_public_key.pem` | The public key for `signature`. | Verifying the lists. |
 
-`source_mask` in `domains-with-sources.txt` is a bitmask of the upstream lists that included the
-domain: BLP (Block List Project) = 1, OISD = 2, HaGeZi = 4, StevenBlack = 8. A mask of 5 means both
-BLP and HaGeZi listed it. The `web-proxy` list uses the same column; see [NOTICE](NOTICE) for what each
-list is built from.
+`source_mask` in `domains-with-sources.txt` is a bitmask of the sources that listed the domain. Add
+the values of the sources that did:
+
+| Bit | Source | Used by |
+|---|---|---|
+| 1 | BLP (Block List Project) | `pornography/` |
+| 2 | OISD | `pornography/` |
+| 4 | HaGeZi | `pornography/` |
+| 8 | StevenBlack | `pornography/` |
+| 16 | UT1 | `web-proxy/` |
+| 32 | hand-curated by BlockerFlow | `web-proxy/` |
+
+In `pornography/` the masks run from 1 to 15; a mask of 5 means BLP and HaGeZi both listed the domain.
+In `web-proxy/` the masks are 16 (UT1 only), 32 (curated only) and 48 (both). [NOTICE](NOTICE) says what
+each source is and under which licence.
 
 Domain matching: the plain and hosts files list exact names. A hosts file only blocks the names it
 lists, not their subdomains. The Adblock syntax (`||domain^`) also blocks subdomains.
@@ -53,7 +64,7 @@ For example, `https://raw.githubusercontent.com/khaleel-git/blockerflow-lists/ma
 **Pi-hole.** In the web interface go to Lists (Adlists in Pi-hole v5), paste
 `https://raw.githubusercontent.com/khaleel-git/blockerflow-lists/main/pornography/domains.txt`, add it,
 then run `pihole -g` (or Tools > Update Gravity). Add `web-proxy/domains.txt` the same way if you want
-that list too. The pornography list has about 894,000 entries, so gravity needs some memory and a
+that list too. The pornography list has close to a million entries, so gravity needs some memory and a
 minute to build on small devices.
 
 **AdGuard Home.** Go to Filters > DNS blocklists > Add a blocklist > Add a custom list, and enter
@@ -64,12 +75,20 @@ minute to build on small devices.
 domains; it does not hide page elements. A list this large slows uBlock Origin's start-up on weak
 devices; a DNS filter (Pi-hole, AdGuard Home) is the better fit for the pornography list.
 
-**Hosts file.** Append `hosts.txt` to your hosts file (as an administrator or with `sudo`):
+**Hosts file.** Add `hosts.txt` to your hosts file as one block between marker comments. The same
+commands install the list and update it later, because they delete an older block first (run them as
+a user who can use `sudo`; macOS and Linux):
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/khaleel-git/blockerflow-lists/main/pornography/hosts.txt \
+URL=https://raw.githubusercontent.com/khaleel-git/blockerflow-lists/main/pornography/hosts.txt
+curl -fsSL "$URL" -o /tmp/blockerflow-hosts.txt &&
+sudo sed -i.bak '/^# BEGIN blockerflow-lists$/,/^# END blockerflow-lists$/d' /etc/hosts &&
+{ echo '# BEGIN blockerflow-lists'; cat /tmp/blockerflow-hosts.txt; echo '# END blockerflow-lists'; } \
   | sudo tee -a /etc/hosts > /dev/null
 ```
+
+`sed` keeps a copy of the old file as `/etc/hosts.bak`. To remove the list, run only the `sed` line.
+Do not use `tee -a` on its own: running it twice adds the list twice.
 
 On Windows the file is `C:\Windows\System32\drivers\etc\hosts`. Most systems cope with a hosts file of
 this size, but Windows' DNS Client service can become slow with several hundred thousand entries; use a
@@ -134,5 +153,5 @@ signed pack, checks the signature and every file's hash, renders the files above
 commit message names the version, and each release is tagged `v<version>` (for example `v20261105.8`).
 The file headers also carry the version and build time. Do not edit the generated files by hand.
 
-The lists come with no warranty and can contain mistakes. To report a wrong entry, open an issue in this
-repository. More about the app: https://www.blockerflow.net
+The lists come with no warranty and can contain mistakes. To report a wrong entry, use the contact
+details on https://www.blockerflow.net, or open an issue here if issues are enabled.

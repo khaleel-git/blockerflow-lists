@@ -57,8 +57,7 @@ under the licence of the folder it sits in. Copyright (c) 2026 BlockerFlow (khal
 
     The two extension folders are mirrors of third-party lists, each with its own MIT notice:
       - clefspeare13: https://github.com/Clefspeare13/pornhosts
-        MIT, per the licence line in the file header that StevenBlack publishes. Contributors
-        named there: Niclas (Clefspeare13), Spirillen (https://www.mypdns.org/p/Spirillen/).
+        MIT, per the licence line in the file header that StevenBlack publishes.
       - sinfonietta: https://github.com/Sinfonietta/hostfiles
         MIT. Copyright (c) 2016 Sinfonietta.
 
@@ -90,6 +89,8 @@ under the licence of the folder it sits in. Copyright (c) 2026 BlockerFlow (khal
               (below), and the same licence on the derived list
     Used in:  web-proxy/domains.txt, web-proxy/domains-with-sources.txt,
               web-proxy/hosts.txt, web-proxy/adblock.txt
+    Mask:     in web-proxy/domains-with-sources.txt, source mask 16 = UT1, 32 = hand-curated
+              by BlockerFlow, 48 = both
     Changes:  BlockerFlow validated each hostname, dropped IP literals, single-label names
               and malformed entries, removed hosts on its allowlist, added a small set of
               hosts it curated by hand, sorted and de-duplicated the result, and rewrote it
