@@ -23,7 +23,7 @@ Paths are relative to the repository root. `<list>` is `pornography` or `web-pro
 | `<list>/domains.txt` | One domain per line, sorted. Lines starting with `#` are comments (the header). | Pi-hole and other tools that take a plain domain list. |
 | `<list>/hosts.txt` | `0.0.0.0 <domain>` per line, sorted. | A hosts file, Pi-hole, any tool that reads hosts format. |
 | `<list>/adblock.txt` | Adblock Plus syntax: `\|\|<domain>^` per line. | AdGuard Home, uBlock Origin. |
-| `<list>/domains-with-sources.txt` | `domain\|source_mask` per line, sorted, no header. This is the exact file the app and the signed manifest use. | Checking the signature, or seeing which source listed a domain. |
+| `<list>/domains-with-sources.txt` | `domain\|source_mask` per line, sorted. The `web-proxy` copy starts with four `#` comment lines. This is the exact file the app and the signed manifest use. | Checking the signature, or seeing which source listed a domain. |
 | `pornography/keywords.txt` | `keyword\|weight\|requiresBoundary` per line. `weight` is a number; `weight >= 100` means high confidence. `requiresBoundary` is `true` or `false` (match whole words only). | Scoring URLs and search terms. |
 | `pornography/keywords_intl.txt` | `term\|kind\|lang` per line, `#` comments. `kind` is `strong`, `adult`, `context`, `help` or `cancel`; the header in the file explains each. | Adult keywords in other languages. |
 | `pornography/keyword_tiers.txt` | `keyword\|strong` or `keyword\|context`. `strong` blocks on its own; `context` only counts next to another adult term. A keyword not listed is `adult` (two needed). | Tiers for `keywords.txt`. |
