@@ -109,18 +109,16 @@ under the licence of the folder it sits in. Copyright (c) 2026 BlockerFlow (khal
     pornography/keyword_tiers.txt
         Labels (strong or context) for BlockerFlow's own keywords from keywords.txt. A script
         sets them from explicit word stems BlockerFlow chose, the adult brand roots (below), and
-        word-frequency lists (section 2.7) and words found in links on popular sites' home
-        pages (a test set from the Tranco list, section 2.8) used to find common words. The
-        file lists BlockerFlow's keywords only; nothing is copied from those inputs.
+        word-frequency lists (section 2.7) and words found in links on the home pages of the
+        most popular sites (a test set built from the Tranco list, section 2.8) used to find
+        common words. The file lists BlockerFlow's keywords only; nothing is copied from those
+        inputs, and no Tranco hostnames or ranks are published here.
     pornography/adult_hostname_keywords.txt
         Brand roots derived from the domain list: a script takes the registrable label of every
         domain in domains.txt, keeps roots that all four sources (2.1 to 2.4) list across at least
         20 domains, and a person reviews them. It is therefore derived from the pornography/
         sources 2.1 to 2.4 and is GPL-3.0 on the same terms. A set of legitimate domains is used
         only to check that no root blocks them; none of those domains are copied.
-    pornography/page_check_skip.txt
-        Hostnames of very popular sites, from the Tranco list (section 2.8), minus every host on
-        the domain and brand lists, minus adult-looking names. See 2.8 for the terms.
     The few web-proxy hosts BlockerFlow added by hand are CC BY-SA 4.0, like the rest of
     web-proxy/.
 
@@ -144,17 +142,15 @@ under the licence of the folder it sits in. Copyright (c) 2026 BlockerFlow (khal
     Terms:    https://tranco-list.eu/  (Attribution section; "Referencing the list" on each
               list page, for example https://tranco-list.eu/list/Y83YG)
     Source:   https://tranco-list.eu  list Y83YG (top 1 million, 2 September to 1 October 2026),
-              top 10,000 domains used
+              top 10,000 domains used to pick the home pages whose links were read
     Requires: citation, as above. Tranco combines rankings from Cisco Umbrella (free of
               charge), Majestic (CC BY 3.0), Farsight, the Chrome User Experience Report
               (CC BY-SA 4.0) and Cloudflare Radar (CC BY-NC 4.0), and says those providers' terms
-              may apply to the data. BlockerFlow keeps only hostnames, not ranks or scores, and
-              treats a list of well-known hostnames as facts, not as a copyrightable work.
-              Anyone who needs certainty, especially for commercial use, should check the
-              provider licences above.
-    Used in:  pornography/page_check_skip.txt
-    Changes:  top 10,000 domains, minus hosts on the pornography domain and brand lists,
-              minus adult-looking names and punycode names.
+              may apply to the data. No Tranco hostname or rank is published in this repository;
+              the list was only used to choose which sites' links were read as a test set for
+              the keyword labels. Anyone who needs certainty, especially for commercial use,
+              should check the provider licences above.
+    Used in:  pornography/keyword_tiers.txt (as an input to the labels, see 2.6)
 
 No UT1 "adult" data is in this repository.
 

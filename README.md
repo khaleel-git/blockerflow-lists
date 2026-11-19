@@ -28,7 +28,6 @@ Paths are relative to the repository root. `<list>` is `pornography` or `web-pro
 | `pornography/keywords_intl.txt` | `term\|kind\|lang` per line, `#` comments. `kind` is `strong`, `adult`, `context`, `help` or `cancel`; the header in the file explains each. | Adult keywords in other languages. |
 | `pornography/keyword_tiers.txt` | `keyword\|strong` or `keyword\|context`. `strong` blocks on its own; `context` only counts next to another adult term. A keyword not listed is `adult` (two needed). | Tiers for `keywords.txt`. |
 | `pornography/adult_hostname_keywords.txt` | One brand root per line, `#` comments. Matched against each dot-separated label of a hostname, also after trailing digits are stripped, so `chaturbate` also matches `chaturbate99.xyz`. | Catching numbered or mirror domains that are not in the domain list. |
-| `pornography/page_check_skip.txt` | One host per line, `#` comments. A host or any parent of it matches. | Hosts whose pages the app never reads (large legitimate sites). |
 | `manifest.json` | JSON with two fields: `payload` (a string holding the pack version, build time and a path, size and sha256 for each source file) and `signature` (base64, ECDSA P-256 over the `payload` string). | Verifying the lists. See below. |
 | `blockerflow_public_key.pem` | The public key for `signature`. | Verifying the lists. |
 
@@ -127,9 +126,12 @@ and `shasum` (or `sha256sum` on Linux). Run these in a checkout of this reposito
 
    For `web-proxy`, use `web-proxy/domains.txt` in the first command and
    `web-proxy/domains-with-sources.txt` in the second. The keyword files and
-   `adult_hostname_keywords.txt` and `page_check_skip.txt` are published unchanged, so their own sha256
-   matches the manifest entry with the same path. `domains.txt`, `hosts.txt` and `adblock.txt` are
-   generated from `domains-with-sources.txt`, which is how they are covered.
+   `adult_hostname_keywords.txt` are published unchanged, so their own sha256 matches the manifest
+   entry with the same path. `domains.txt`, `hosts.txt` and `adblock.txt` are
+   generated from `domains-with-sources.txt`, which is how they are covered. The signed manifest also
+   lists files that BlockerFlow ships but that are not published here (for example
+   `pornography/page_check_skip.txt` and `pornography/domains.len`), so some of its entries have no
+   matching file in this repository. That does not affect the checks above.
 
 3. To see the pack version and build time, run `jq -r .payload manifest.json | jq '{version, created}'`.
 
